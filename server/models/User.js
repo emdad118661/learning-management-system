@@ -1,24 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    required: true 
-  },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true // 2 people can't create account with same email
-  },
-  password: { 
-    type: String, 
-    required: true 
-  },
-  role: { 
-    type: String, 
-    enum: ['student', 'teacher'], // only 2 types of user
-    default: 'student' 
-  },
-}, { timestamps: true }); // save account creation date
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['student', 'teacher'], default: 'student' },
+  meetingSlug: { type: String, unique: true, sparse: true }, // ✅ ইউনিক মিটিং স্লাগ
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

@@ -2,57 +2,79 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // our own user model path
+const User = require('../models/User');
 
-// 1. Registration Route
+// @route   POST api/auth/register
+// @desc    Register new user
+// @access  Public
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // check whether the email is already exists or not
+    // চেক করা হচ্ছে এই ইমেইলে আগে থেকেই কোনো অ্যাকাউন্ট আছে কি না
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "this email already exists" });
+      return res.status(400).json({ message: "এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে!" });
     }
 
-    // encrypt the password (Hash)
+    // পাসওয়ার্ড এনক্রিপ্ট (Hash) করা
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // create and save new user in database
-    user = new User({
+    // নতুন ইউজার অবজেক্ট তৈরি
+    const userData = {
       name,
       email,
       password: hashedPassword,
-      role: role || 'student' // if there's nothing, by default'student'
-    });
+      role: role || 'student'
+    };
+
+    // ✅ Teacher হলে meetingSlug তৈরি করো
+    if (role === 'teacher') {
+      // নাম থেকে স্লাগ তৈরি (যেমন: "Asgar Ali" → "asgar")
+      const meetingSlug = name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '');
+      
+      // চেক করো স্লাগটি ইউনিক কি না
+      const existingTeacher = await User.findOne({ meetingSlug });
+      if (existingTeacher) {
+        // যদি ইউনিক না হয়, তবে র্যান্ডম নম্বর যুক্ত করো
+        userData.meetingSlug = `${meetingSlug}${Math.floor(Math.random() * 1000)}`;
+      } else {
+        userData.meetingSlug = meetingSlug;
+      }
+    }
+
+    // ইউজার সেভ করো
+    user = new User(userData);
     await user.save();
 
-    res.status(201).json({ message: "account has been created successfully" });
+    res.status(201).json({ message: "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!" });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("server error");
+    console.error('Registration Error:', err.message);
+    res.status(500).json({ message: "সার্ভার এরর" });
   }
 });
 
-// 2. Login Route
+// @route   POST api/auth/login
+// @desc    Login user
+// @access  Public
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check user
+    // ইউজার আছে কি না চেক করা
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "wrong email or password" });
+      return res.status(400).json({ message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
     }
 
-    // check password
+    // পাসওয়ার্ড মিলছে কি না চেক করা
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "wrong email or password" });
+      return res.status(400).json({ message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
     }
 
-    // token will be created if password matches
+    // পাসওয়ার্ড মিলে গেলে একটি Token তৈরি করে দেওয়া
     const payload = {
       user: {
         id: user.id,
@@ -62,16 +84,24 @@ router.post('/login', async (req, res) => {
 
     jwt.sign(
       payload,
-      process.env.JWT_SECRET, // secret key in .env file
-      { expiresIn: '7d' }, // will work for 7 days
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+        res.json({ 
+          token, 
+          user: { 
+            id: user.id, 
+            name: user.name, 
+            role: user.role,
+            meetingSlug: user.meetingSlug 
+          } 
+        });
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("server error");
+    console.error('Login Error:', err.message);
+    res.status(500).json({ message: "সার্ভার এরর" });
   }
 });
 

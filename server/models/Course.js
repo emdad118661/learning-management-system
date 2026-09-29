@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
-  teacherId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // teacher details
   thumbnail: String,
+  meetingLink: String, // ✅ নতুন ফিল্ড যুক্ত করা হলো
+  teacherId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   lessons: [
     {
       title: String,

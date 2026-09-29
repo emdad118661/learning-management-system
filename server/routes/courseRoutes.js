@@ -8,12 +8,14 @@ const { auth, checkRole } = require('../middleware/authMiddleware');
 // @access  Private (Teacher only)
 router.post('/', auth, checkRole('teacher'), async (req, res) => {
   try {
-    const { title, description, thumbnail, lessons } = req.body;
+    // POST /api/courses এর ভেতরে
+    const { title, description, thumbnail, meetingLink, lessons } = req.body;
 
     const newCourse = new Course({
       title,
       description,
       thumbnail,
+      meetingLink, // ✅ যুক্ত করা হলো
       teacherId: req.user.id,
       lessons
     });
@@ -45,7 +47,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).populate('teacherId', 'name email');
-    
+
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }

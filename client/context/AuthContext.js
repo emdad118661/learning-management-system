@@ -27,8 +27,14 @@ export const AuthProvider = ({ children }) => {
       password
     });
     
-    Cookies.set('token', res.data.token, { expires: 7 });
-    Cookies.set('user', JSON.stringify(res.data.user), { expires: 7 });
+    Cookies.set('token', res.data.token, { 
+      expires: 7,
+      path: '/'
+    });
+    Cookies.set('user', JSON.stringify(res.data.user), { 
+      expires: 7,
+      path: '/'
+    });
     axios.defaults.headers.common['x-auth-token'] = res.data.token;
     setUser(res.data.user);
     
@@ -45,12 +51,23 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  //logout
+  // ✅ Simplified logout - no router needed
   const logout = () => {
-    Cookies.remove('token');
-    Cookies.remove('user');
+    console.log(' Logging out...');
+    console.log('Token before remove:', Cookies.get('token'));
+    
+    // ✅ Cookie remove করার সময় একই options দিতে হবে
+    Cookies.remove('token', { path: '/' });
+    Cookies.remove('user', { path: '/' });
+    
     delete axios.defaults.headers.common['x-auth-token'];
     setUser(null);
+    
+    console.log('Token after remove:', Cookies.get('token'));
+    console.log('Redirecting to login...');
+    
+    // ✅ window.location.href ব্যবহার করো - এটি সবসময় কাজ করে
+    window.location.href = '/login';
   };
 
   return (

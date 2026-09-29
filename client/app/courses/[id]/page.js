@@ -41,17 +41,16 @@ export default function CourseDetailPage() {
   };
 
   const markLessonComplete = async (lessonId) => {
-  try {
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/progress/complete`, {
-      courseId: params.id,
-      lessonId
-    });
-    // fetch again after progress update.
-    fetchProgress();
-  } catch (err) {
-    console.error('Failed to mark complete:', err);
-  }
-};
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/progress/complete`, {
+        courseId: params.id,
+        lessonId
+      });
+      fetchProgress();
+    } catch (err) {
+      console.error('Failed to mark complete:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -78,6 +77,7 @@ export default function CourseDetailPage() {
         ← Back to Courses
       </Link>
 
+      {/* Course Info Card */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
         <p className="text-gray-600 mb-4">{course.description}</p>
@@ -86,6 +86,35 @@ export default function CourseDetailPage() {
         </p>
       </div>
 
+      {/* ✅ Meeting Link Section (নতুন যুক্ত করা হয়েছে) */}
+      {course.meetingLink && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <h2 className="text-2xl font-semibold text-blue-700">Live Meeting Room</h2>
+          </div>
+          <p className="text-gray-700 mb-4 text-lg">
+            Join <strong>{course.teacherId?.name}</strong>'s live class session:
+          </p>
+          <div className="flex flex-wrap gap-4 items-center">
+            <a
+              href={course.meetingLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 font-semibold transition shadow-md"
+            >
+              🎥 Join Meeting Now
+            </a>
+            <span className="text-sm text-gray-500 break-all bg-white px-3 py-2 rounded border">
+               {course.meetingLink}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Lessons Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-6">Course Lessons</h2>
         

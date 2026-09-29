@@ -21,14 +21,17 @@ app.use('/api/auth', require('./routes/auth'));
 // upload routes
 app.use('/api/upload', require('./routes/uploadRoutes'));
 
+// Course routes
+app.use('/api/courses', require('./routes/courseRoutes'));
+
 // progress route
 app.use('/api/progress', require('./routes/progressRoutes'));
 
  // clender route
 app.use('/api/calendar', require('./routes/calendarRoutes'));
 
-// Course routes
-app.use('/api/courses', require('./routes/courseRoutes'));
+//meeting routes
+app.use('/api/meet', require('./routes/meetRoutes'));
 
 // Root Route
 app.get('/', (req, res) => {
