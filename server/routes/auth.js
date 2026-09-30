@@ -11,17 +11,17 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // চেক করা হচ্ছে এই ইমেইলে আগে থেকেই কোনো অ্যাকাউন্ট আছে কি না
+    // Checking if an account already exists for this email.
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে!" });
+      return res.status(400).json({ message: "Successfully created!" });
     }
 
-    // পাসওয়ার্ড এনক্রিপ্ট (Hash) করা
+    // Encrypt (Hash) the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // নতুন ইউজার অবজেক্ট তৈরি
+    // Create new user object
     const userData = {
       name,
       email,
@@ -29,29 +29,29 @@ router.post('/register', async (req, res) => {
       role: role || 'student'
     };
 
-    // ✅ Teacher হলে meetingSlug তৈরি করো
+    // ✅ If the user is a teacher, create a meetingSlug.
     if (role === 'teacher') {
-      // নাম থেকে স্লাগ তৈরি (যেমন: "Asgar Ali" → "asgar")
+      // Generating a slug from a name (e.g., "Asgar Ali" → "asgar")
       const meetingSlug = name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '');
       
       // চেক করো স্লাগটি ইউনিক কি না
       const existingTeacher = await User.findOne({ meetingSlug });
       if (existingTeacher) {
-        // যদি ইউনিক না হয়, তবে র্যান্ডম নম্বর যুক্ত করো
+        // If it is not unique, add a random number.
         userData.meetingSlug = `${meetingSlug}${Math.floor(Math.random() * 1000)}`;
       } else {
         userData.meetingSlug = meetingSlug;
       }
     }
 
-    // ইউজার সেভ করো
+    // Save the user.
     user = new User(userData);
     await user.save();
 
-    res.status(201).json({ message: "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!" });
+    res.status(201).json({ message: "Account successfully created!" });
   } catch (err) {
     console.error('Registration Error:', err.message);
-    res.status(500).json({ message: "সার্ভার এরর" });
+    res.status(500).json({ message: "Server erro" });
   }
 });
 
@@ -62,19 +62,19 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ইউজার আছে কি না চেক করা
+    // Checking if the user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
+      return res.status(400).json({ message: "wrong email or password!" });
     }
 
-    // পাসওয়ার্ড মিলছে কি না চেক করা
+    // Checking if the passwords match
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "ভুল ইমেইল বা পাসওয়ার্ড!" });
+      return res.status(400).json({ message: "wrong email or password!" });
     }
 
-    // পাসওয়ার্ড মিলে গেলে একটি Token তৈরি করে দেওয়া
+    // Generating a token if the password matches.
     const payload = {
       user: {
         id: user.id,
@@ -101,7 +101,7 @@ router.post('/login', async (req, res) => {
     );
   } catch (err) {
     console.error('Login Error:', err.message);
-    res.status(500).json({ message: "সার্ভার এরর" });
+    res.status(500).json({ message: "server error" });
   }
 });
 

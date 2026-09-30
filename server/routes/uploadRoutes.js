@@ -14,7 +14,7 @@ router.post('/', upload.single('file'), async (req, res) => {
       public_id: req.file.filename
     });
   } catch (error) {
-    console.error('Upload Error:', error); // টার্মিনালে বিস্তারিত এরর দেখাবে
+    console.error('Upload Error:', error); // Detailed errors will be displayed in the terminal.
     res.status(500).json({ message: 'Upload failed', error: error.message });
   }
 });

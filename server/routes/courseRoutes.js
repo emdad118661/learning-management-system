@@ -15,7 +15,7 @@ router.post('/', auth, checkRole('teacher'), async (req, res) => {
       title,
       description,
       thumbnail,
-      meetingLink, // ✅ যুক্ত করা হলো
+      meetingLink, // ✅ newly added
       teacherId: req.user.id,
       lessons
     });

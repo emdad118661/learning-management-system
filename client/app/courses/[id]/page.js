@@ -86,7 +86,7 @@ export default function CourseDetailPage() {
         </p>
       </div>
 
-      {/* ✅ Meeting Link Section (নতুন যুক্ত করা হয়েছে) */}
+      {/* ✅ Meeting Link Section (newly added) */}
       {course.meetingLink && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
           <div className="flex items-center gap-3 mb-4">

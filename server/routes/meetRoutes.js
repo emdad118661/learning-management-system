@@ -17,7 +17,7 @@ router.get('/:teacherSlug', async (req, res) => {
       return res.status(404).json({ message: 'Teacher not found' });
     }
 
-    // টিচারের সব কোর্স বের করো যেখানে meetingLink আছে
+    // List all of the teacher's courses that have a meeting link.
     const courses = await Course.find({ 
       teacherId: teacher._id,
       meetingLink: { $exists: true, $ne: null }

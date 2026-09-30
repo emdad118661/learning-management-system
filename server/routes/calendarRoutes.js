@@ -14,7 +14,7 @@ router.post('/', auth, checkRole('teacher'), async (req, res) => {
       return res.status(400).json({ message: 'Title and eventDate are required' });
     }
 
-    // courseId খালি থাকলে undefined সেট করো (MongoDB এ সেভ হবে না)
+    // Set to `undefined` if `courseId` is empty (it will not be saved in MongoDB).
     const eventData = {
       teacherId: req.user.id,
       title,
@@ -22,7 +22,7 @@ router.post('/', auth, checkRole('teacher'), async (req, res) => {
       eventDate: new Date(eventDate)
     };
 
-    // courseId শুধু তখনই যুক্ত করো যদি এটি ভ্যালিড হয়
+    // Add the courseId only if it is valid.
     if (courseId && courseId.trim() !== '') {
       eventData.courseId = courseId;
     }
@@ -61,7 +61,7 @@ router.delete('/:id', auth, checkRole('teacher'), async (req, res) => {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    // চেক করো ইভেন্টটি কি এই টিচার নিজের তৈরি করা
+    // Check if the teacher created this event themselves.
     if (event.teacherId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this event' });
     }

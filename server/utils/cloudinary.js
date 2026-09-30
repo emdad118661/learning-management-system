@@ -10,7 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Multer স্টোরেজ সেটআপ
+// Multer storage steup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
