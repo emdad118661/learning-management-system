@@ -7,7 +7,13 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://lms-frontend.onrender.com'
+  ],
+  credentials: true
+}));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
