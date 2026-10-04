@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://lms-frontend-c0sn.onrender.com/'
+    'https://lms-frontend-c0sn.onrender.com'
   ],
   credentials: true
 }));
